@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise AI Agent Strategy</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #0B1628; --accent: #3B82F6; --accent-glow: #60A5FA;
+  --surface: #F0F4FA; --text-muted: #5A6A85; --white: #FFFFFF;
+  --red: #EF4444; --page-bg: #EEF3FB;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--page-bg); font-family: 'DM Sans', sans-serif; color: var(--navy); }
+
+/* NAV DOTS */
+.nav-dots { position: fixed; right: 26px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 100; }
+.nav-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(11,22,40,0.18); cursor: pointer; transition: background .25s, transform .25s; border: none; padding: 0; }
+.nav-dot.active { background: var(--accent); transform: scale(1.45); }
+
+/* SECTIONS */
+.page-section { min-height: 100vh; padding: 52px 24px 60px; display: flex; flex-direction: column; align-items: center; }
+#section-0 { background: var(--page-bg); }
+#section-1 { background: #E8EFF9; }
+#section-2 { background: #EBF5F0; }
+.page-divider { width: 100%; height: 4px; background: linear-gradient(90deg,transparent,var(--accent),transparent); opacity: .3; }
+.container { width: 940px; max-width: 100%; }
+
+/* ── PAGE 1 HEADER ── */
+.p1-header { text-align: center; margin-bottom: 36px; }
+.eyebrow-red { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--red); margin-bottom:12px; }
+.eyebrow-blue { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+.section-h1 { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--navy); line-height:1.18; max-width:700px; margin:0 auto 10px; }
+.section-h1 .hl-red { color:var(--red); }
+.section-h1 .hl-blue { color:var(--accent); }
+.section-sub { font-size:14px; color:var(--text-muted); max-width:560px; margin:0 auto; line-height:1.6; }
+
+/* PEOPLE BAR */
+.people-bar { background:var(--white); border-radius:16px; padding:20px 28px 18px; border:1px solid #D6E2F0; box-shadow:0 2px 14px rgba(11,22,40,.06); }
+.bar-label { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); text-align:center; margin-bottom:14px; }
+.roles-row { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.role-pill { display:flex; align-items:center; gap:7px; padding:8px 16px; border-radius:20px; background:var(--surface); border:1px solid #D6E2F0; font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:var(--navy); }
+.bar-caption { text-align:center; font-size:13px; color:var(--text-muted); font-style:italic; }
+
+/* CONNECTORS */
+.conn { display:flex; flex-direction:column; align-items:center; padding:4px 0; }
+.conn-line { width:2px; height:22px; }
+.conn-line.red-line { background:linear-gradient(to bottom,#CBD5E1,#EF4444); }
+.conn-line.blue-line { background:linear-gradient(to bottom,var(--accent),var(--accent-glow)); }
+.conn-line.grey-line { background:linear-gradient(to bottom,#CBD5E1,#9CA3AF); }
+.conn-arrow { width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; }
+.conn-arrow.red-arrow { border-top:9px solid #EF4444; }
+.conn-arrow.blue-arrow { border-top:9px solid var(--accent-glow); }
+.conn-arrow.grey-arrow { border-top:9px solid #9CA3AF; }
+
+/* SYSTEM LAYERS */
+.sys-layer { border-radius:14px; padding:18px 22px; }
+.sys-layer.core { background:var(--white); border:1px solid #D6E2F0; box-shadow:0 2px 12px rgba(11,22,40,.06); }
+.sys-layer.supporting { background:#FAFAFA; border:1px solid #E2E8F0; }
+.sys-layer-label { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; margin-bottom:12px; }
+.sys-layer.core .sys-layer-label { color:#1E40AF; }
+.sys-layer.supporting .sys-layer-label { color:#6B7280; }
+.sys-cards-row { display:flex; gap:9px; flex-wrap:wrap; }
+.sys-card { flex:1; min-width:120px; border-radius:10px; padding:12px 13px; cursor:default; transition:transform .2s; }
+.sys-card:hover { transform:translateY(-2px); }
+.sys-layer.core .sys-card { background:#EFF6FF; border:1px solid #BFDBFE; color:#1E3A8A; }
+.sys-layer.supporting .sys-card { background:#F3F4F6; border:1px solid #E5E7EB; color:#374151; }
+.sys-card-title { font-family:'Syne',sans-serif; font-size:12px; font-weight:800; margin-bottom:6px; }
+.sys-card-items { display:flex; flex-direction:column; gap:3px; }
+.sys-card-item { font-size:11px; opacity:.72; display:flex; align-items:center; gap:5px; }
+.sys-card-item::before { content:''; width:3px; height:3px; border-radius:50%; background:currentColor; flex-shrink:0; opacity:.5; }
+
+/* COST BAND */
+.cost-band { background:linear-gradient(135deg,#1C0A0A,#3B0F0F 50%,#1C0A0A); border-radius:14px; padding:22px 26px; position:relative; overflow:hidden; box-shadow:0 6px 32px rgba(239,68,68,.2); }
+.cost-band::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(239,68,68,.7),transparent); }
+.cost-band-title { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(239,68,68,.8); margin-bottom:14px; }
+.cost-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; }
+.cost-item { background:rgba(255,255,255,.05); border:1px solid rgba(239,68,68,.2); border-radius:10px; padding:12px; }
+.cost-item-op { font-size:11px; color:rgba(255,255,255,.5); margin-bottom:6px; line-height:1.4; }
+.cost-item-impact { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:#FCA5A5; }
+
+/* CFO TAKEAWAY */
+.cfo-box { margin-top:18px; background:var(--white); border-radius:14px; padding:20px 26px; border-left:4px solid var(--red); box-shadow:0 2px 16px rgba(11,22,40,.07); }
+.cfo-label { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--red); margin-bottom:8px; }
+.cfo-quote { font-size:14px; color:var(--navy); line-height:1.6; }
+.cfo-close { font-family:'Syne',sans-serif; font-size:13.5px; font-weight:700; color:var(--navy); font-style:italic; border-top:1px solid #E2E8F0; padding-top:10px; margin-top:10px; }
+
+/* SCROLL HINT */
+.scroll-hint { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:32px; font-size:12px; color:var(--text-muted); cursor:pointer; }
+.scroll-hint svg { animation:bounceD 1.6s ease-in-out infinite; }
+@keyframes bounceD { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+
+/* ── PAGE 2 ── */
+.p2-header { text-align:center; margin-bottom:34px; }
+.p2-h1 { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--navy); line-height:1.15; }
+.p2-sub { font-size:14px; color:var(--text-muted); margin-top:8px; }
+
+.people-layer { background:var(--white); border-radius:18px; padding:22px 30px 18px; box-shadow:0 2px 20px rgba(11,22,40,.07); border:1px solid #D6E2F0; }
+.people-label { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--text-muted); text-align:center; margin-bottom:14px; }
+.people-icons { display:flex; justify-content:center; gap:11px; flex-wrap:wrap; margin-bottom:12px; }
+.person-card { display:flex; flex-direction:column; align-items:center; gap:7px; padding:11px 14px 9px; border-radius:12px; background:var(--surface); border:1px solid #D6E2F0; min-width:90px; cursor:default; transition:transform .2s,box-shadow .2s; }
+.person-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(59,130,246,.14); }
+.person-icon { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; }
+.person-name { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--navy); text-align:center; }
+.people-tagline { text-align:center; font-size:13px; color:var(--text-muted); font-style:italic; }
+
+.agent-layer { background:linear-gradient(135deg,#0B1628,#0F2A55 50%,#0B1628); border-radius:18px; padding:28px 32px; position:relative; overflow:hidden; box-shadow:0 8px 48px rgba(11,22,40,.35),0 0 0 1px rgba(59,130,246,.2); }
+.agent-layer::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 60% 40% at 20% 50%,rgba(59,130,246,.12),transparent 70%),radial-gradient(ellipse 40% 60% at 80% 30%,rgba(96,165,250,.08),transparent 70%); pointer-events:none; }
+.agent-layer::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(96,165,250,.6),transparent); }
+.agent-top { display:flex; align-items:flex-start; justify-content:space-between; gap:30px; margin-bottom:24px; position:relative; z-index:1; }
+.agent-title-block { flex:1; }
+.agent-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(59,130,246,.18); border:1px solid rgba(59,130,246,.35); border-radius:20px; padding:4px 12px; margin-bottom:10px; }
+.agent-badge-dot { width:6px; height:6px; border-radius:50%; background:var(--accent-glow); box-shadow:0 0 6px var(--accent-glow); animation:pulse 2s ease-in-out infinite; }
+.agent-badge span { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-glow); }
+.agent-title { font-family:'Syne',sans-serif; font-size:23px; font-weight:800; color:var(--white); line-height:1.1; }
+.agent-title em { color:var(--accent-glow); font-style:normal; }
+.agent-capabilities { flex:1; display:flex; flex-direction:column; gap:7px; }
+.capability-item { display:flex; align-items:center; gap:9px; font-size:13px; color:rgba(255,255,255,.8); }
+.cap-icon { width:20px; height:20px; border-radius:50%; background:rgba(59,130,246,.25); border:1px solid rgba(96,165,250,.4); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px; }
+.agent-divider { height:1px; background:linear-gradient(90deg,transparent,rgba(96,165,250,.3),transparent); margin-bottom:18px; position:relative; z-index:1; }
+.examples-label { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.4); margin-bottom:11px; position:relative; z-index:1; }
+.examples-grid { display:flex; flex-wrap:wrap; gap:9px; position:relative; z-index:1; }
+.example-bubble { background:rgba(255,255,255,.07); border:1px solid rgba(96,165,250,.25); border-radius:24px; padding:8px 15px; font-size:13px; font-weight:500; color:rgba(255,255,255,.9); cursor:default; display:flex; align-items:center; gap:6px; transition:background .2s,border-color .2s,transform .2s; }
+.example-bubble:hover { background:rgba(59,130,246,.2); border-color:rgba(96,165,250,.6); transform:translateY(-2px); }
+
+.saas-header { text-align:center; padding-top:14px; margin-bottom:13px; }
+.saas-label { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--text-muted); }
+.saas-sublabel { font-size:12px; color:#9BACC0; margin-top:2px; }
+.saas-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:11px; }
+.saas-card { border-radius:14px; padding:17px 14px; position:relative; overflow:hidden; cursor:default; transition:transform .2s,box-shadow .2s; }
+.saas-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:14px 14px 0 0; }
+.saas-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(0,0,0,.18); }
+.saas-card.crm { background:#1E3A5F; } .saas-card.crm::before { background:#3B82F6; }
+.saas-card.erp { background:#163347; } .saas-card.erp::before { background:#06B6D4; }
+.saas-card.pm  { background:#1A3B2E; } .saas-card.pm::before  { background:#10B981; }
+.saas-card.analytics { background:#2D1B4E; } .saas-card.analytics::before { background:#8B5CF6; }
+.saas-card-icon { font-size:20px; margin-bottom:7px; }
+.saas-card-title { font-family:'Syne',sans-serif; font-size:12px; font-weight:800; color:var(--white); margin-bottom:9px; }
+.saas-card-items { display:flex; flex-direction:column; gap:4px; }
+.saas-item { font-size:11px; color:rgba(255,255,255,.6); display:flex; align-items:center; gap:5px; }
+.saas-item::before { content:''; width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,.35); flex-shrink:0; }
+
+/* ── PAGE 3 STYLES ── */
+.eyebrow-green { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#059669; margin-bottom:12px; }
+
+/* Three-column progression */
+.progression-grid { display:grid; grid-template-columns:1fr 40px 1fr 40px 1fr; gap:0; align-items:start; margin-bottom:22px; }
+.prog-col { display:flex; flex-direction:column; align-items:center; gap:0; }
+.prog-col-header { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; text-align:center; margin-bottom:12px; padding:6px 14px; border-radius:20px; }
+.prog-col-header.today { color:#EF4444; background:#FEF2F2; border:1px solid #FECACA; }
+.prog-col-header.transition { color:#F59E0B; background:#FFFBEB; border:1px solid #FDE68A; }
+.prog-col-header.future { color:#059669; background:#ECFDF5; border:1px solid #A7F3D0; }
+.prog-box { width:100%; background:var(--white); border-radius:13px; padding:16px 14px; border:1px solid #D6E2F0; box-shadow:0 2px 10px rgba(11,22,40,.06); }
+.prog-box.today-box { border-color:#FECACA; }
+.prog-box.future-box { border-color:#A7F3D0; }
+.prog-people { display:flex; justify-content:center; margin-bottom:10px; }
+.prog-person { background:var(--surface); border:1px solid #D6E2F0; border-radius:8px; padding:6px 12px; font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--navy); }
+.prog-mini-conn { display:flex; flex-direction:column; align-items:center; margin:4px 0; }
+.prog-mini-line { width:1.5px; height:14px; }
+.prog-mini-line.red { background:#EF4444; }
+.prog-mini-line.amber { background:#F59E0B; }
+.prog-mini-line.green { background:#059669; }
+.prog-mini-arrow { width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; }
+.prog-mini-arrow.red { border-top:7px solid #EF4444; }
+.prog-mini-arrow.amber { border-top:7px solid #F59E0B; }
+.prog-mini-arrow.green { border-top:7px solid #059669; }
+.prog-agent-chip { background:linear-gradient(135deg,#0B1628,#0F2A55); border-radius:8px; padding:8px 12px; margin-bottom:10px; text-align:center; }
+.prog-agent-chip span { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--accent-glow); }
+.prog-systems { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.prog-sys-chip { border-radius:7px; padding:5px 7px; text-align:center; font-family:'Syne',sans-serif; font-size:10px; font-weight:700; }
+.prog-sys-chip.full { background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; }
+.prog-sys-chip.reduced { background:#F0FDF4; color:#065F46; border:1px solid #A7F3D0; }
+.prog-sys-chip.optional { background:#F9FAFB; color:#6B7280; border:1px solid #E5E7EB; opacity:.6; }
+.prog-legend { display:flex; gap:10px; margin-top:8px; justify-content:center; flex-wrap:wrap; }
+.prog-legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-muted); }
+.prog-legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.prog-arrow-col { display:flex; align-items:center; justify-content:center; padding-top:36px; }
+.prog-horiz-arrow { display:flex; align-items:center; gap:0; }
+.prog-horiz-line { height:2px; width:24px; background:linear-gradient(to right,#CBD5E1,var(--accent)); }
+.prog-horiz-tip { width:0; height:0; border-top:5px solid transparent; border-bottom:5px solid transparent; border-left:7px solid var(--accent); }
+
+/* Stage table */
+.stage-table { width:100%; border-radius:14px; overflow:hidden; border:1px solid #D6E2F0; background:var(--white); box-shadow:0 2px 14px rgba(11,22,40,.06); margin-bottom:20px; }
+.stage-table-header { display:grid; grid-template-columns:36px 1fr 2fr 1.4fr; background:#0B1628; padding:10px 16px; gap:12px; }
+.stage-th { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.5); }
+.stage-row { display:grid; grid-template-columns:36px 1fr 2fr 1.4fr; padding:12px 16px; gap:12px; border-bottom:1px solid #F0F4FA; align-items:center; transition:background .15s; cursor:default; }
+.stage-row:last-child { border-bottom:none; }
+.stage-row:hover { background:#F8FAFD; }
+.stage-num { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-size:12px; font-weight:800; flex-shrink:0; }
+.stage-name { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:var(--navy); }
+.stage-desc { font-size:12px; color:var(--text-muted); line-height:1.45; }
+.stage-impact { font-size:12px; font-weight:500; }
+
+/* CFO Benefits row */
+.cfo-benefits { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+.benefit-card { background:var(--white); border-radius:12px; padding:16px 14px; border:1px solid #D6E2F0; box-shadow:0 2px 10px rgba(11,22,40,.05); border-top:3px solid; }
+.benefit-card:nth-child(1) { border-top-color:#059669; }
+.benefit-card:nth-child(2) { border-top-color:#3B82F6; }
+.benefit-card:nth-child(3) { border-top-color:#F59E0B; }
+.benefit-card:nth-child(4) { border-top-color:#8B5CF6; }
+.benefit-icon { font-size:20px; margin-bottom:8px; }
+.benefit-title { font-family:'Syne',sans-serif; font-size:12px; font-weight:800; color:var(--navy); margin-bottom:6px; }
+.benefit-items { display:flex; flex-direction:column; gap:3px; }
+.benefit-item { font-size:11.5px; color:var(--text-muted); display:flex; align-items:center; gap:5px; }
+.benefit-item::before { content:''; width:3px; height:3px; border-radius:50%; background:#CBD5E1; flex-shrink:0; }
+
+/* Closing message */
+.closing-msg { background:linear-gradient(135deg,#0B1628,#0F2A55 50%,#0B1628); border-radius:14px; padding:20px 28px; text-align:center; position:relative; overflow:hidden; box-shadow:0 6px 32px rgba(11,22,40,.2); }
+.closing-msg::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(96,165,250,.5),transparent); }
+.closing-msg p { font-family:'Syne',sans-serif; font-size:15px; font-weight:600; color:var(--white); line-height:1.5; position:relative; z-index:1; }
+.closing-msg p span { color:var(--accent-glow); }
+
+/* ANIMATIONS */
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(.85)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+.anim { opacity:0; }
+.anim.vis { animation:fadeUp .5s ease both; }
+</style>
+</head>
+<body>
+
+<div class="nav-dots">
+  <button class="nav-dot active" onclick="goTo(0)" title="Problem"></button>
+  <button class="nav-dot" onclick="goTo(1)" title="Solution"></button>
+  <button class="nav-dot" onclick="goTo(2)" title="Flexibility"></button>
+</div>
+
+<!-- ═══════════════════════════════════
+     SECTION 1 — PROBLEM STATEMENT
+═══════════════════════════════════ -->
+<section class="page-section" id="section-0">
+<div class="container">
+
+  <div class="p1-header anim">
+    <div class="eyebrow-red">The Problem</div>
+    <h1 class="section-h1">Enterprise SaaS Growth Has Increased<br><span class="hl-red">Operational Cost and Complexity</span></h1>
+    <p class="section-sub">Most organisations now operate dozens of SaaS platforms across core functions — each adding capability, and cost.</p>
+  </div>
+
+  <div class="anim" style="animation-delay:.05s">
+    <div class="people-bar">
+      <div class="bar-label">Employees</div>
+      <div class="roles-row">
+        <div class="role-pill">💼 Sales</div>
+        <div class="role-pill">⚙️ Operations</div>
+        <div class="role-pill">📦 Procurement</div>
+        <div class="role-pill">💳 Finance</div>
+        <div class="role-pill">👔 Management</div>
+      </div>
+      <div class="bar-caption">Employees must navigate multiple enterprise systems to complete everyday work</div>
+    </div>
+  </div>
+
+  <div class="conn anim" style="animation-delay:.08s">
+    <div class="conn-line red-line"></div>
+    <div class="conn-arrow red-arrow"></div>
+  </div>
+
+  <!-- Core Systems -->
+  <div class="anim" style="animation-delay:.12s">
+    <div class="sys-layer core">
+      <div class="sys-layer-label">Layer 1 — Core Enterprise Systems</div>
+      <div class="sys-cards-row">
+        <div class="sys-card">
+          <div class="sys-card-title">CRM</div>
+          <div class="sys-card-items">
+            <div class="sys-card-item">Customer records</div>
+            <div class="sys-card-item">Opportunity mgmt</div>
+          </div>
+        </div>
+        <div class="sys-card">
+          <div class="sys-card-title">ERP / Finance</div>
+          <div class="sys-card-items">
+            <div class="sys-card-item">Orders &amp; invoicing</div>
+            <div class="sys-card-item">Payments</div>
+          </div>
+        </div>
+        <div class="sys-card">
+          <div class="sys-card-title">Procurement</div>
+          <div class="sys-card-items">
+            <div class="sys-card-item">Purchase orders</div>
+            <div class="sys-card-item">Supplier mgmt</div>
+          </div>
+        </div>
+        <div class="sys-card">
+          <div class="sys-card-title">Project / Work Mgmt</div>
+          <div class="sys-card-items">
+            <div class="sys-card-item">Tasks &amp; projects</div>
+            <div class="sys-card-item">Project delivery</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="conn" style="padding:4px 0;">
+    <div class="conn-line grey-line"></div>
+    <div class="conn-arrow grey-arrow"></div>
+  </div>
+
+  <!-- Supporting Systems -->
+  <div class="anim" style="animation-delay:.16s">
+    <div class="sys-layer supporting">
+      <div class="sys-layer-label">Layer 2 — Supporting SaaS Systems</div>
+      <div class="sys-cards-row">
+        <div class="sys-card">
+          <div class="sys-card-title">Analytics Platforms</div>
+          <div class="sys-card-items"><div class="sys-card-item">Reporting &amp; BI</div></div>
+        </div>
+        <div class="sys-card">
+          <div class="sys-card-title">Document Mgmt</div>
+          <div class="sys-card-items"><div class="sys-card-item">Storage &amp; sharing</div></div>
+        </div>
+        <div class="sys-card">
+          <div class="sys-card-title">Communication Tools</div>
+          <div class="sys-card-items"><div class="sys-card-item">Messaging &amp; email</div></div>
+        </div>
+        <div class="sys-card">
+          <div class="sys-card-title">Integration &amp; Automation</div>
+          <div class="sys-card-items"><div class="sys-card-item">Middleware tools</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="conn" style="padding:4px 0;">
+    <div class="conn-line" style="height:22px;background:linear-gradient(to bottom,#9CA3AF,#EF4444);"></div>
+    <div class="conn-arrow red-arrow"></div>
+  </div>
+
+  <!-- Cost Band -->
+  <div class="anim" style="animation-delay:.2s">
+    <div class="cost-band">
+      <div class="cost-band-title">Layer 3 — Cost &amp; Operational Impact</div>
+      <div class="cost-grid">
+        <div class="cost-item">
+          <div class="cost-item-op">Employees navigating multiple systems</div>
+          <div class="cost-item-impact">Lost Productivity</div>
+        </div>
+        <div class="cost-item">
+          <div class="cost-item-op">Data manually entered across platforms</div>
+          <div class="cost-item-impact">Higher Operational Cost</div>
+        </div>
+        <div class="cost-item">
+          <div class="cost-item-op">Integration &amp; middleware tools</div>
+          <div class="cost-item-impact">Additional Tech Spend</div>
+        </div>
+        <div class="cost-item">
+          <div class="cost-item-op">Large number of SaaS licences</div>
+          <div class="cost-item-impact">Underutilised Subscriptions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CFO Takeaway -->
+  <div class="cfo-box anim" style="animation-delay:.26s">
+    <div class="cfo-label">CFO Takeaway</div>
+    <p class="cfo-quote">Enterprise SaaS investments have increased capability — but also created fragmented workflows and rising operational costs.</p>
+    <div class="cfo-close">The challenge is not replacing systems — it is reducing the cost and complexity of operating them.</div>
+  </div>
+
+  <div class="scroll-hint" onclick="goTo(1)">
+    <span>See the solution</span>
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#3B82F6" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+    </svg>
+  </div>
+
+</div>
+</section>
+
+<div class="page-divider"></div>
+
+<!-- ═══════════════════════════════════
+     SECTION 2 — AI AGENT SOLUTION
+═══════════════════════════════════ -->
+<section class="page-section" id="section-1">
+<div class="container">
+
+  <div class="p2-header anim">
+    <div class="eyebrow-blue">The Solution</div>
+    <h1 class="p2-h1">How <span style="color:var(--accent)">AI Agents</span> Transform<br>Enterprise Operations</h1>
+    <p class="p2-sub">Employees interact through natural language — AI agents do the rest</p>
+  </div>
+
+  <!-- People -->
+  <div class="anim" style="animation-delay:.05s">
+    <div class="people-layer">
+      <div class="people-label">Employees</div>
+      <div class="people-icons">
+        <div class="person-card"><div class="person-icon" style="background:#EFF6FF;">💼</div><div class="person-name">Sales</div></div>
+        <div class="person-card"><div class="person-icon" style="background:#F0FDF4;">⚙️</div><div class="person-name">Operations</div></div>
+        <div class="person-card"><div class="person-icon" style="background:#FFF7ED;">📦</div><div class="person-name">Procurement</div></div>
+        <div class="person-card"><div class="person-icon" style="background:#FDF4FF;">💳</div><div class="person-name">Finance</div></div>
+        <div class="person-card"><div class="person-icon" style="background:#FFF1F2;">👔</div><div class="person-name">Management</div></div>
+      </div>
+      <div class="people-tagline">Interact with AI agents instead of navigating multiple systems</div>
+    </div>
+  </div>
+
+  <div class="conn anim" style="animation-delay:.1s">
+    <div class="conn-line blue-line"></div>
+    <div class="conn-arrow blue-arrow"></div>
+  </div>
+
+  <!-- AI Agent Layer -->
+  <div class="anim" style="animation-delay:.15s">
+    <div class="agent-layer">
+      <div class="agent-top">
+        <div class="agent-title-block">
+          <div class="agent-badge"><div class="agent-badge-dot"></div><span>Active</span></div>
+          <div class="agent-title">AI Agent<br><em>Operating Layer</em></div>
+        </div>
+        <div class="agent-capabilities">
+          <div class="capability-item"><div class="cap-icon">💬</div>Understand requests in natural language</div>
+          <div class="capability-item"><div class="cap-icon">⚡</div>Automate operational workflows</div>
+          <div class="capability-item"><div class="cap-icon">🔗</div>Orchestrate actions across enterprise systems</div>
+          <div class="capability-item"><div class="cap-icon">📊</div>Retrieve data and generate insights</div>
+        </div>
+      </div>
+      <div class="agent-divider"></div>
+      <div class="examples-label">Automation Examples</div>
+      <div class="examples-grid">
+        <div class="example-bubble">📄 Quote Generation</div>
+        <div class="example-bubble">🛒 Order Automation</div>
+        <div class="example-bubble">📋 Purchase Order Automation</div>
+        <div class="example-bubble">🧾 Invoice Processing</div>
+        <div class="example-bubble">✅ Task Creation</div>
+        <div class="example-bubble">📈 Natural Language Reporting</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="conn anim" style="animation-delay:.2s">
+    <div class="conn-line blue-line"></div>
+    <div class="conn-arrow blue-arrow"></div>
+  </div>
+
+  <!-- SaaS Grid -->
+  <div class="anim" style="animation-delay:.25s">
+    <div class="saas-header">
+      <div class="saas-label">Enterprise SaaS Systems</div>
+      <div class="saas-sublabel">Execution Layer</div>
+    </div>
+    <div class="saas-grid">
+      <div class="saas-card crm">
+        <div class="saas-card-icon">🤝</div>
+        <div class="saas-card-title">CRM Platforms</div>
+        <div class="saas-card-items">
+          <div class="saas-item">Lead capture</div>
+          <div class="saas-item">Opportunity management</div>
+          <div class="saas-item">Customer records</div>
+        </div>
+      </div>
+      <div class="saas-card erp">
+        <div class="saas-card-icon">🏭</div>
+        <div class="saas-card-title">ERP / Finance</div>
+        <div class="saas-card-items">
+          <div class="saas-item">Orders &amp; Procurement</div>
+          <div class="saas-item">Inventory</div>
+          <div class="saas-item">Invoicing &amp; Payments</div>
+        </div>
+      </div>
+      <div class="saas-card pm">
+        <div class="saas-card-icon">📌</div>
+        <div class="saas-card-title">Project Management</div>
+        <div class="saas-card-items">
+          <div class="saas-item">Tasks &amp; Projects</div>
+          <div class="saas-item">Resource planning</div>
+          <div class="saas-item">Delivery tracking</div>
+        </div>
+      </div>
+      <div class="saas-card analytics">
+        <div class="saas-card-icon">🔬</div>
+        <div class="saas-card-title">Analytics &amp; Data</div>
+        <div class="saas-card-items">
+          <div class="saas-item">Reporting</div>
+          <div class="saas-item">Forecasting</div>
+          <div class="saas-item">Operational insights</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint" onclick="goTo(2)">
+    <span>See the opportunity</span>
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#3B82F6" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+    </svg>
+  </div>
+
+</div>
+</section>
+
+<div class="page-divider"></div>
+
+<!-- ═══════════════════════════════════
+     SECTION 3 — FLEXIBILITY / CFO
+═══════════════════════════════════ -->
+<section class="page-section" id="section-2">
+<div class="container">
+
+  <div class="anim" style="text-align:center;margin-bottom:34px;">
+    <div class="eyebrow-green">The Opportunity</div>
+    <h1 style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--navy);line-height:1.15;margin-bottom:10px;">AI Agents Create <span style="color:#059669">Flexibility</span> in How<br>Organisations Use SaaS</h1>
+    <p style="font-size:14px;color:var(--text-muted);">Optimise SaaS spend without large transformation programs</p>
+  </div>
+
+  <!-- Progression: Today → Transition → Future -->
+  <div class="progression-grid anim" style="animation-delay:.05s;">
+
+    <!-- TODAY -->
+    <div class="prog-col">
+      <div class="prog-col-header today">Today</div>
+      <div class="prog-box today-box">
+        <div class="prog-people"><div class="prog-person">👥 Employees</div></div>
+        <div class="prog-mini-conn"><div class="prog-mini-line red"></div><div class="prog-mini-arrow red"></div></div>
+        <div class="prog-systems" style="grid-template-columns:1fr 1fr;">
+          <div class="prog-sys-chip full">CRM</div>
+          <div class="prog-sys-chip full">ERP</div>
+          <div class="prog-sys-chip full">Procurement</div>
+          <div class="prog-sys-chip full">PM Tools</div>
+          <div class="prog-sys-chip full" style="grid-column:span 2;">Analytics</div>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:10px;font-style:italic;">Direct navigation across all systems</p>
+      </div>
+    </div>
+
+    <!-- Arrow 1 -->
+    <div class="prog-arrow-col">
+      <div class="prog-horiz-arrow">
+        <div class="prog-horiz-line"></div>
+        <div class="prog-horiz-tip"></div>
+      </div>
+    </div>
+
+    <!-- TRANSITION -->
+    <div class="prog-col">
+      <div class="prog-col-header transition">Transition</div>
+      <div class="prog-box">
+        <div class="prog-people"><div class="prog-person">👥 Employees</div></div>
+        <div class="prog-mini-conn"><div class="prog-mini-line amber"></div><div class="prog-mini-arrow amber"></div></div>
+        <div class="prog-agent-chip"><span>⚡ AI Agents</span></div>
+        <div class="prog-mini-conn"><div class="prog-mini-line amber"></div><div class="prog-mini-arrow amber"></div></div>
+        <div class="prog-systems">
+          <div class="prog-sys-chip full">CRM</div>
+          <div class="prog-sys-chip full">ERP</div>
+          <div class="prog-sys-chip full">Procurement</div>
+          <div class="prog-sys-chip full">PM Tools</div>
+          <div class="prog-sys-chip full" style="grid-column:span 2;">Analytics</div>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:10px;font-style:italic;">AI orchestrates workflows across all systems</p>
+      </div>
+    </div>
+
+    <!-- Arrow 2 -->
+    <div class="prog-arrow-col">
+      <div class="prog-horiz-arrow">
+        <div class="prog-horiz-line"></div>
+        <div class="prog-horiz-tip"></div>
+      </div>
+    </div>
+
+    <!-- FUTURE -->
+    <div class="prog-col">
+      <div class="prog-col-header future">Future Flexibility</div>
+      <div class="prog-box future-box">
+        <div class="prog-people"><div class="prog-person">👥 Employees</div></div>
+        <div class="prog-mini-conn"><div class="prog-mini-line green"></div><div class="prog-mini-arrow green"></div></div>
+        <div class="prog-agent-chip" style="background:linear-gradient(135deg,#064E3B,#065F46);"><span style="color:#6EE7B7;">⚡ AI Agents</span></div>
+        <div class="prog-mini-conn"><div class="prog-mini-line green"></div><div class="prog-mini-arrow green"></div></div>
+        <div class="prog-systems">
+          <div class="prog-sys-chip reduced">CRM ✓</div>
+          <div class="prog-sys-chip reduced">ERP ✓</div>
+          <div class="prog-sys-chip optional">Procurement</div>
+          <div class="prog-sys-chip optional">PM Tools</div>
+          <div class="prog-sys-chip reduced" style="grid-column:span 2;">Selected Modules</div>
+        </div>
+        <div class="prog-legend">
+          <div class="prog-legend-item"><div class="prog-legend-dot" style="background:#059669;"></div>Retained</div>
+          <div class="prog-legend-item"><div class="prog-legend-dot" style="background:#D1D5DB;"></div>Reduced / Optional</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage Table -->
+  <div class="anim" style="animation-delay:.1s;">
+    <div class="stage-table">
+      <div class="stage-table-header">
+        <div class="stage-th">#</div>
+        <div class="stage-th">Stage</div>
+        <div class="stage-th">Operating Model</div>
+        <div class="stage-th">CFO Impact</div>
+      </div>
+      <div class="stage-row">
+        <div class="stage-num" style="background:#EFF6FF;color:#1D4ED8;">1</div>
+        <div class="stage-name">AI Augmentation</div>
+        <div class="stage-desc">AI agents automate tasks across existing SaaS tools</div>
+        <div class="stage-impact" style="color:#1D4ED8;">Immediate productivity gains</div>
+      </div>
+      <div class="stage-row">
+        <div class="stage-num" style="background:#FFFBEB;color:#B45309;">2</div>
+        <div class="stage-name">Workflow Automation</div>
+        <div class="stage-desc">AI orchestrates end-to-end operational workflows</div>
+        <div class="stage-impact" style="color:#B45309;">Reduced manual operations</div>
+      </div>
+      <div class="stage-row">
+        <div class="stage-num" style="background:#F0FDF4;color:#065F46;">3</div>
+        <div class="stage-name">AI Operational Interface</div>
+        <div class="stage-desc">Employees interact primarily with AI agents</div>
+        <div class="stage-impact" style="color:#065F46;">Less need to navigate multiple systems</div>
+      </div>
+      <div class="stage-row">
+        <div class="stage-num" style="background:#ECFDF5;color:#059669;">4</div>
+        <div class="stage-name">SaaS Optimisation</div>
+        <div class="stage-desc">Organisations reduce licenses or move to lower feature tiers</div>
+        <div class="stage-impact" style="color:#059669;">Lower SaaS spend</div>
+      </div>
+      <div class="stage-row">
+        <div class="stage-num" style="background:#F5F3FF;color:#7C3AED;">5</div>
+        <div class="stage-name">Strategic Flexibility</div>
+        <div class="stage-desc">Continue with existing systems or replace modules gradually</div>
+        <div class="stage-impact" style="color:#7C3AED;">Lower transformation risk</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CFO Benefits -->
+  <div class="cfo-benefits anim" style="animation-delay:.15s;">
+    <div class="benefit-card">
+      <div class="benefit-icon">💰</div>
+      <div class="benefit-title">Lower SaaS Cost</div>
+      <div class="benefit-items">
+        <div class="benefit-item">Fewer licenses</div>
+        <div class="benefit-item">Lower feature tiers</div>
+      </div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">⚡</div>
+      <div class="benefit-title">Operational Efficiency</div>
+      <div class="benefit-items">
+        <div class="benefit-item">Automation of routine workflows</div>
+        <div class="benefit-item">Reduced manual effort</div>
+      </div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">🛡️</div>
+      <div class="benefit-title">Reduced Transformation Risk</div>
+      <div class="benefit-items">
+        <div class="benefit-item">No large system replacement</div>
+        <div class="benefit-item">Incremental change</div>
+      </div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">🔀</div>
+      <div class="benefit-title">Strategic Flexibility</div>
+      <div class="benefit-items">
+        <div class="benefit-item">Replace systems gradually</div>
+        <div class="benefit-item">Retain optionality</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Closing message -->
+  <div class="closing-msg anim" style="animation-delay:.2s;">
+    <p>AI agents allow organisations to <span>optimise SaaS investments</span> while maintaining flexibility over future systems.</p>
+  </div>
+
+</div>
+</section>
+
+<script>
+function goTo(idx) {
+  document.getElementById('section-'+idx).scrollIntoView({behavior:'smooth'});
+}
+const secs = document.querySelectorAll('.page-section');
+const dots = document.querySelectorAll('.nav-dot');
+const dotObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && e.intersectionRatio > 0.4) {
+      const i = [...secs].indexOf(e.target);
+      dots.forEach((d,j) => d.classList.toggle('active', i===j));
+    }
+  });
+}, {threshold: 0.4});
+secs.forEach(s => dotObs.observe(s));
+const anims = document.querySelectorAll('.anim');
+const animObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); });
+}, {threshold: 0.1});
+anims.forEach(el => animObs.observe(el));
+</script>
+</body>
+</html>
